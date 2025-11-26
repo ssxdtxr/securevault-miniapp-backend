@@ -12,7 +12,7 @@ import Joi from 'joi';
       envFilePath: '.env',
       validationSchema: Joi.object({
         BOT_TOKEN: Joi.string().required(),
-        WEB_API_URL: Joi.string().uri().required(),
+        WEB_APP_URL: Joi.string().uri().required(),
       }),
     }),
     BotModule,
