@@ -1,37 +1,32 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Telegraf } from 'telegraf';
+import { Telegraf, Markup } from 'telegraf';
 
 @Injectable()
 export class BotService implements OnModuleInit {
   private bot: Telegraf;
-  constructor(private readonly configServise: ConfigService) {}
+
+  constructor(private readonly configService: ConfigService) {}
 
   onModuleInit() {
-    const token = process.env.BOT_TOKEN;
-    const webAppUrl = process.env.WEB_API_URL;
+    const token = this.configService.get('BOT_TOKEN');
+    const webAppUrl = this.configService.get('WEB_API_URL');
 
-    if (!(token && webAppUrl)) {
-      console.error('Токен или URL - не заданы');
-      return;
+    if (!token || !webAppUrl) {
+      throw new Error('BOT_TOKEN или WEB_API_URL не заданы');
     }
 
     this.bot = new Telegraf(token);
 
     this.bot.start((ctx) => {
-      ctx.reply('Добро пожаловать в SecureVault', {
-        reply_markup: {
-          keyboard: [
-            [
-              {
-                text: 'Открыть хранилище',
-                web_app: {
-                  url: webAppUrl,
-                },
-              },
-            ],
-          ],
-        },
+      const keyboard = Markup.keyboard([
+        [Markup.button.webApp('Открыть хранилище', webAppUrl)],
+      ])
+        .resize()
+        .oneTime();
+
+      return ctx.reply('Добро пожаловать в SecureVault', {
+        reply_markup: keyboard.reply_markup,
       });
     });
 
