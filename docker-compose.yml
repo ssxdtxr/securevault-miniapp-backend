@@ -1,0 +1,30 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: securevault-postgres
+    environment:
+      - POSTGRES_USER=securevault
+      - POSTGRES_PASSWORD=securevault
+      - POSTGRES_DB=securevault
+    ports:
+      - '5432:5432'
+    volumes:
+      - posgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U securevault -d securevault']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: securevault-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - '3000:3000'
+
+volumes:
+  posgres_data:
