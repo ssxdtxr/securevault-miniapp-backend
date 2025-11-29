@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import type { SyncUserDto } from './dto/sync-user.dto';
 import { PrismaService } from 'prisma/prisma.service';
 import { User } from 'generated/prisma/client';
@@ -9,6 +9,12 @@ export class UsersService {
 
   async syncFromTelegram(dto: SyncUserDto): Promise<User> {
     const { telegram_id, name, username } = dto;
+
+    console.log(dto);
+
+    if (!telegram_id) {
+      throw new BadRequestException('telegram_id is required');
+    }
 
     return this.prisma.user.upsert({
       where: { telegram_id },

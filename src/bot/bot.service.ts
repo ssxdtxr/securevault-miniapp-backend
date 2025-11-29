@@ -4,14 +4,13 @@ import { Telegraf, Markup } from 'telegraf';
 
 @Injectable()
 export class BotService implements OnModuleInit {
-  private bot: Telegraf;
+  private bot: Telegraf | undefined;
 
   constructor(private readonly configService: ConfigService) {}
 
   onModuleInit() {
     const token = this.configService.get('BOT_TOKEN');
     const webAppUrl = this.configService.get('WEB_APP_URL');
-
 
     if (!token || !webAppUrl) {
       throw new Error('BOT_TOKEN или WEB_API_URL не заданы');
@@ -37,7 +36,6 @@ export class BotService implements OnModuleInit {
         reply_markup: keyboard.reply_markup,
       });
     });
-
 
     this.bot.launch();
     console.log('Bot started');

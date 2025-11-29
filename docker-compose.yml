@@ -2,29 +2,39 @@ services:
   postgres:
     image: postgres:16
     container_name: securevault-postgres
+    ports:
+      - '5432:5432'
     environment:
       - POSTGRES_USER=securevault
       - POSTGRES_PASSWORD=securevault
       - POSTGRES_DB=securevault
-    ports:
-      - '5432:5432'
-    volumes:
-      - posgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U securevault -d securevault']
-      interval: 5s
-      timeout: 5s
-      retries: 10
-  backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: securevault-backend
-    depends_on:
-      postgres:
-        condition: service_healthy
-    ports:
-      - '3000:3000'
-
+    
+    # prisma-studio:
+    #   image: node:18-alpine
+    #   working_dir: /app
+    #   volumes:
+    #     - ./backend:/app
+    #   ports: 
+    #     - "5555:5555"
+    #   environment:
+    #     - DATABASE_URL=postgresql://securevault:securevault@localhost:5432/securevault?schema=public
+    #   depends_on:
+    #     - postgres
+    #   command: npx prisma studio
+  # backend:
+  #   container_name: securevault-nest
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.dev
+  #   ports:
+  #     - '3000:3000'
+  #   volumes: 
+  #     - ./: /usr/src/app
+  #     - /usr/src/app/node_modules
+  #   environment:
+  #     - DATABASE_URL=postgresql://securevault:securevault@localhost:5432/securevault?schema=public
+  #     - NODE_ENV=development
+  #   depends_on:
+  #     - postgres
 volumes:
-  posgres_data:
+  postgres_data:
