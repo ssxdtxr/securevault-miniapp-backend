@@ -4,7 +4,7 @@ import { Telegraf, Markup } from 'telegraf';
 
 @Injectable()
 export class BotService implements OnModuleInit {
-  private bot: Telegraf | undefined;
+  private bot?: Telegraf;
 
   constructor(private readonly configService: ConfigService) {}
 
@@ -19,18 +19,9 @@ export class BotService implements OnModuleInit {
     this.bot = new Telegraf(token);
 
     this.bot.command('start', (ctx) => {
-      const user = ctx.from;
-      console.log('[/start] from =', user);
-
-      const url = new URL(webAppUrl);
-
-      if (user?.first_name) url.searchParams.set('name', user.first_name);
-      if (user?.username) url.searchParams.set('username', user.username);
-      if (user?.id) url.searchParams.set('tg_id', String(user.id));
-
-      const keyboard = Markup.keyboard([
-        [Markup.button.webApp('Открыть хранилище', url.toString())],
-      ]).resize();
+      const keyboard = Markup.inlineKeyboard([
+        [Markup.button.webApp('Открыть хранилище', webAppUrl)],
+      ]);
 
       return ctx.reply('Добро пожаловать в SecureVault', {
         reply_markup: keyboard.reply_markup,
